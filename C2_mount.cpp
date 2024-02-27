@@ -37,7 +37,7 @@ MountDriver::MountDriver()
     setVersion(1, 0);
 
     // Set capabilities supported by the mount.
-    // The last parameters is the number of slew rates available.
+    // The last parameter is the number of slew rates available.
     SetTelescopeCapability(TELESCOPE_CAN_PARK | TELESCOPE_CAN_SYNC | TELESCOPE_CAN_GOTO | TELESCOPE_CAN_ABORT |
                            TELESCOPE_HAS_PIER_SIDE |
                            TELESCOPE_HAS_TIME | TELESCOPE_HAS_LOCATION | TELESCOPE_HAS_TRACK_MODE | TELESCOPE_CAN_CONTROL_TRACK |
@@ -48,7 +48,7 @@ MountDriver::MountDriver()
 
 const char *MountDriver::getDefaultName()
 {
-    return "Mount Driver";
+    return "Mount_Driver";
 }
 
 bool MountDriver::initProperties()
