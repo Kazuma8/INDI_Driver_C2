@@ -9,6 +9,12 @@
 const uint8_t CSPin1 = 10;
 const uint8_t CSPin2 = 9;
 
+const byte numDataBytes = 8;
+const byte numDataBits = numDataBytes * 8;
+byte receivedBytes[numDataBytes];
+byte numReceived = 0;
+
+boolean newData = false;
 
 
 SoftwareSerial serial(RX_PIN, TX_PIN);
@@ -16,26 +22,82 @@ SoftwareSerial serial(RX_PIN, TX_PIN);
 void setup() {
 
   // Initialize serial communication
-  Serial.begin(9600);
   serial.begin(BAUD_RATE);
+  // Show Arduino is ready
+  Serial.println("<Arduino is ready>");
 
   SPI.begin();
 }
 
 void loop() {
+
+  recvBytesWithStartEndMarkers();
+  processData();
+
   // Check if data is available to read
   if (serial.available()) {
     // Read the incoming byte
     uint8_t input = serial.read();
 
     // Not the last 4 bits contain action type.
-    uint8_t action = input >> 4;
-    uint8_t parameter = input^(action << 4)
+    uint8_t action = input >> numDataBits;
+    uint8_t parameter = input^(action << numDataBits)
     
     // Process the input
     processInput(action);
   }
 }
+
+void recvBytesWithStartEndMarkers() {
+    static boolean recvInProgress = false;
+    static byte ndx = 0;
+    byte startMarker = 0x3C;
+    byte endMarker = 0x3E;
+    byte rb;
+   
+
+    while (Serial.available() > 0 && newData == false) {
+        rb = Serial.read();
+
+        if (recvInProgress == true) {
+            if (rb != endMarker) {
+                receivedBytes[ndx] = rb;
+                ndx++;
+                if (ndx >= numBytes) {
+                    ndx = numBytes - 1;
+                }
+            }
+            else {
+                receivedBytes[ndx] = '\0'; // terminate the string
+                recvInProgress = false;
+                numReceived = ndx;  // save the number for use when printing
+                ndx = 0;
+                newData = true;
+            }
+        }
+
+        else if (rb == startMarker) {
+            recvInProgress = true;
+        }
+    }
+}
+
+void processData() {
+    if (newData == true) {
+        Serial.print("This just in (HEX values)... ");
+        for (byte n = 0; n < numReceived; n++) {
+            // Not the last 4 bits contain action type.
+            uint8_t action = input >> numDataBits;
+            uint8_t parameter = input^(action << numDataBits)
+            
+            // Process the input
+            processInput(action);
+        }
+        Serial.println();
+        newData = false;
+    }
+}
+
 
 void processInput(uint8_t action) {
   // Define your actions based on input values
@@ -104,7 +166,7 @@ void processInput(uint8_t action) {
   }
 }
 
-// Define your action functions here
+//Actions defined
 void Handshake() {
   // Code for Handshake action
   Serial.println("Calling Handshake function");
