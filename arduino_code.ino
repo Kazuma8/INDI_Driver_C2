@@ -9,12 +9,29 @@
 const uint8_t CSPin1 = 10;
 const uint8_t CSPin2 = 9;
 
+//BIN
 const byte numDataBytes = 8;
 const byte numDataBits = numDataBytes * 8;
 byte receivedBytes[numDataBytes];
 byte numReceived = 0;
 
 boolean newData = false;
+
+/// CHAR
+const byte numChars = 32;
+char receivedChars[numChars];
+
+boolean newDataChar = false;
+
+
+
+void loop() {
+    recvWithStartEndMarkers();
+    showNewData();
+}
+
+
+
 
 
 SoftwareSerial serial(RX_PIN, TX_PIN);
@@ -31,7 +48,9 @@ void setup() {
 
 void loop() {
 
-  recvBytesWithStartEndMarkers();
+  recvWithStartEndMarkers();      ///CHAR
+
+  recvBytesWithStartEndMarkers();   /// BIN
   processData();
 
   // Check if data is available to read
@@ -48,7 +67,43 @@ void loop() {
   }
 }
 
-void recvBytesWithStartEndMarkers() {
+void recvWithStartEndMarkers() {                 ////CHAR
+    static boolean recvInProgress = false;
+    static byte ndx = 0;
+    char startMarker = '<';
+    char endMarker = '>';
+    char rc;
+ 
+    while (Serial.available() > 0 && newDataChar == false) {
+        rc = Serial.read();
+
+        if (recvInProgress == true) {
+            if (rc != endMarker) {
+                receivedChars[ndx] = rc;
+                ndx++;
+                if (ndx >= numChars) {
+                    ndx = numChars - 1;
+                }
+            }
+            else {
+                receivedChars[ndx] = '\0'; // terminate the string
+                recvInProgress = false;
+                ndx = 0;
+                newDataChar = true;
+            }
+        }
+
+        else if (rc == startMarker) {
+            recvInProgress = true;
+        }
+    }
+}
+
+
+
+
+
+void recvBytesWithStartEndMarkers() {             ////BIN
     static boolean recvInProgress = false;
     static byte ndx = 0;
     byte startMarker = 0x3C;
@@ -81,6 +136,15 @@ void recvBytesWithStartEndMarkers() {
         }
     }
 }
+
+void showNewData() {
+    if (newDataChar == true) {
+        Serial.print("This just in ... ");
+        Serial.println(receivedChars);
+        newDataChar = false;
+    }
+}
+
 
 void processData() {
     if (newData == true) {
