@@ -22,9 +22,7 @@ SoftwareSerial serial(RX_PIN, TX_PIN);
 void setup() {
 
   // Initialize serial communication
-  serial.begin(BAUD_RATE);
-  // Show Arduino is ready
-  Serial.println("<Arduino is ready>");
+    serial.begin(BAUD_RATE);
 
   SPI.begin();
 }
@@ -139,13 +137,13 @@ void processInput(uint8_t action) {
     case 12: //00001100XXXX
       SetTrackRate();
       break;
-    case 13: //00001101XXXX
+    case 13: //00001101XXXX  Moves telescope to a specified RA/DEC
       Goto();
       break;
-    case 14: //00001110XXXX
+    case 14: //00001110XXXX  Updates mount coordinates
       Sync();
       break;
-    case 15: //00001111XXXX
+    case 15: //00001111XXXX  Update GPS location
       updateLocation();
       break;
     case 16: //00010000XXXX
@@ -160,7 +158,10 @@ void processInput(uint8_t action) {
     case 19: //00010011XXXX
       SetDefaultPark();
       break;
-    
+    case 20:
+      returnCoords();
+      break;
+        
     default:
       Serial.println("Unknown input");
   }
@@ -169,7 +170,9 @@ void processInput(uint8_t action) {
 //Actions defined
 void Handshake() {
   // Code for Handshake action
-  Serial.println("Calling Handshake function");
+
+
+
 }
 
 void OutputStatus() {
@@ -248,4 +251,8 @@ void SetCurrentPark() {
 
 void SetDefaultPark() {
   // Code for SetDefaultPark action
+}
+
+void returnCoords(){
+  // Code for returning coordinates
 }
