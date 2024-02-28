@@ -25,15 +25,6 @@ boolean newDataChar = false;
 
 
 
-void loop() {
-    recvWithStartEndMarkers();
-    showNewData();
-}
-
-
-
-
-
 SoftwareSerial serial(RX_PIN, TX_PIN);
 
 void setup() {
@@ -47,6 +38,7 @@ void setup() {
 void loop() {
 
   recvWithStartEndMarkers();      ///CHAR
+  showNewData();
 
   recvBytesWithStartEndMarkers();   /// BIN
   processData();
@@ -68,8 +60,8 @@ void loop() {
 void recvWithStartEndMarkers() {                 ////CHAR
     static boolean recvInProgress = false;
     static byte ndx = 0;
-    char startMarker = '<';
-    char endMarker = '>';
+    const char startMarker = '<';
+    const char endMarker = '>';
     char rc;
  
     while (Serial.available() > 0 && newDataChar == false) {
@@ -135,6 +127,7 @@ void recvBytesWithStartEndMarkers() {             ////BIN
     }
 }
 
+
 void showNewData() {
     if (newDataChar == true) {
         Serial.print("This just in ... ");
@@ -160,69 +153,75 @@ void processData() {
     }
 }
 
+void extractCommand(){
+  if (newDataChar == true){
+    return receivedChars[0]
+  }
+}
 
-void processInput(uint8_t action) {
+
+void processInput(char command) {
   // Define your actions based on input values
 
-  switch(action) {
-    case 1: //00000001XXXX
+  switch(command) {
+    case 'H': //00000001XXXX  'Handshake'
       Handshake();
       break;
-    case 2: //00000010XXXX
+    case 'O': //00000010XXXX  'Output'
       OutputStatus();
       break;
-    case 3: //00000011XXXX
+    case 'D': //00000011XXXX  'Declination'
       MoveNS();
       break;
-    case 4: //00000100XXXX
+    case 'R': //00000100XXXX  'Right Ascension'
       MoveWE();
       break; 
-    case 5: //00000101XXXX
+    case 'A': //00000101XXXX  'Abort'
       Abort();
       break;
-    case 6: //00000110XXXX
+    case 'N': //00000110XXXX  'North'
       StepNorth();
       break;
-    case 7: //00000111XXXX
+    case 'S': //00000111XXXX  'South'
       StepSouth();
       break;
-    case 8: //00001000XXXX
+    case 'E': //00001000XXXX  'East'
       StepEast();
       break;
-    case 9: //00001001XXXX
+    case 'W': //00001001XXXX  'West'
       StepWest();
       break;
-    case 10: //00001010XXXX
+    case 'T': //00001010XXXX  'Tracking mode'
       SetTrackMode();
       break;
-    case 11: //00001011XXXX
+    case 't': //00001011XXXX  '"t"racking enabled'
       SetTrackEnabled();
       break;
-    case 12: //00001100XXXX
+    case 'r': //00001100XXXX  '"r"ate of tracking'
       SetTrackRate();
       break;
-    case 13: //00001101XXXX  Moves telescope to a specified RA/DEC
+    case 'G': //00001101XXXX  'Goto'                       Moves telescope to a specified RA/DEC
       Goto();
       break;
-    case 14: //00001110XXXX  Updates mount coordinates
+    case 's': //00001110XXXX  '"s"ync'                     Updates mount coordinates
       Sync();
       break;
-    case 15: //00001111XXXX  Update GPS location
+    case 'L': //00001111XXXX  'Location'                   Update GPS location
       updateLocation();
       break;
-    case 16: //00010000XXXX
+    case 'P': //00010000XXXX  'Park'
       Park();
       break;
-    case 17: //00010001XXXX
+    case 'U': //00010001XXXX  'Unpark'
       Unpark();
       break;
-    case 18: //00010010XXXX
+    case 'c': //00010010XXXX  '"c"urrent park'
       SetCurrentPark();
       break;
-    case 19: //00010011XXXX
+    case 'd': //00010011XXXX  '"d"efault park'
       SetDefaultPark();
       break;
-    case 20:
+    case 'C': //              'Coordinates'
       returnCoords();
       break;
         
@@ -234,7 +233,7 @@ void processInput(uint8_t action) {
 //Actions defined
 void Handshake() {
   // Code for Handshake action
-
+  
 
 
 }
