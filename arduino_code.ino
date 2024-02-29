@@ -1,14 +1,17 @@
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include <DRV8461Stepper.h>
+#include <stdint.h>
+#include <string>
 
 #define RX_PIN 10
 #define TX_PIN 11
 #define BAUD_RATE 9600
 
-const uint8_t CSPin1 = 10;
-const uint8_t CSPin2 = 9;
+const uint_fast8_t CSPin1 = 10;
+const uint_fast8_t CSPin2 = 9;
 
+/*
 //BIN
 const byte numDataBytes = 8;
 const byte numDataBits = numDataBytes * 8;
@@ -16,6 +19,7 @@ byte receivedBytes[numDataBytes];
 byte numReceived = 0;
 
 boolean newData = false;
+*/
 
 /// CHAR
 const byte numChars = 32;
@@ -23,6 +27,15 @@ char receivedChars[numChars];
 
 boolean newDataChar = false;
 
+///  Internal Variables
+
+uint_fast32_t RA_current = 0;
+uint_fast32_t DEC_current = 0;
+uint_fast8_t  TrackingRate = 0;
+uint_fast8_t  RA_stepperRate = 0;
+uint_fast8_t  DEC_stepperRate = 0;
+uint_fast8_t  RA_slewRate = 0;
+std::string   status = "fhptk"
 
 
 void loop() {
@@ -46,8 +59,9 @@ void setup() {
 
 void loop() {
 
-  recvWithStartEndMarkers();      ///CHAR
+  recvWithStartEndMarkers();      ///CHAR          Stores received data to "receivedChars"
 
+  /*
   recvBytesWithStartEndMarkers();   /// BIN
   processData();
 
@@ -63,6 +77,7 @@ void loop() {
     // Process the input
     processInput(action);
   }
+  */
 }
 
 void recvWithStartEndMarkers() {                 ////CHAR
@@ -100,7 +115,7 @@ void recvWithStartEndMarkers() {                 ////CHAR
 
 
 
-
+/*
 void recvBytesWithStartEndMarkers() {             ////BIN
     static boolean recvInProgress = false;
     static byte ndx = 0;
@@ -134,17 +149,9 @@ void recvBytesWithStartEndMarkers() {             ////BIN
         }
     }
 }
-
-void showNewData() {
-    if (newDataChar == true) {
-        Serial.print("This just in ... ");
-        Serial.println(receivedChars);
-        newDataChar = false;
-    }
-}
-
-
-void processData() {
+*/
+/*
+void processData() {                                    ///BIN
     if (newData == true) {
         Serial.print("This just in (HEX values)... ");
         for (byte n = 0; n < numReceived; n++) {
@@ -157,6 +164,15 @@ void processData() {
         }
         Serial.println();
         newData = false;
+    }
+}
+*/
+
+void showNewData() {
+    if (newDataChar == true) {
+        Serial.print("This just in ... ");
+        Serial.println(receivedChars);
+        newDataChar = false;
     }
 }
 
